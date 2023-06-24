@@ -1,0 +1,876 @@
+<!-- Import the component -->
+<script type="module" src="https://unpkg.com/@google/model-viewer/dist/model-viewer.min.js"></script>
+<html xmlns="http://www.w3.org/1999/xhtml">
+
+<head>
+	<link type="text/css" rel="stylesheet" href="css/materialize.min.css" media="screen,projection" />
+	<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+	<meta name="robots" content="noindex">
+
+	<title>PPR: Physically Plausible Reconstruction from Monocular Videos
+	</title>
+
+	<style type="text/css">
+		body {
+			font-family: Times;
+			background-color: #f2f2f2;
+			font-size: 15px;
+		}
+
+		.content {
+			width: 1000px;
+			padding: 25px 25px;
+			margin: 25px auto;
+			background-color: #fff;
+			border-radius: 20px;
+		}
+
+		.description {
+			font-family: "Times";
+			white-space: pre;
+			text-align: left;
+		}
+
+		.content-title {
+			background-color: inherit;
+			margin-bottom: 0;
+			padding-bottom: 0;
+		}
+
+		a,
+		a:visited {
+			text-decoration: none;
+			color: blue;
+		}
+
+		.anchor {
+			color: inherit;
+		}
+
+		#authors {
+			text-align: center;
+		}
+
+		#conference {
+			text-align: center;
+			font-style: italic;
+		}
+
+		#authors a {
+			margin: 0 10px;
+		}
+
+		h1 {
+			text-align: center;
+			font-family: Times;
+			font-size: 35px;
+		}
+
+		h2 {
+			font-family: Times;
+			font-size: 25px;
+			padding: 0;
+			margin: 10px;
+		}
+
+		h3 {
+			font-family: Times;
+			font-size: 20px;
+			padding: 0;
+			margin: 10px;
+		}
+
+		p {
+			font-family: Times;
+			line-height: 130%;
+			margin: 10px;
+		}
+
+		big {
+			font-family: Times;
+			font-size: 20px;
+		}
+
+		td {
+			font-size: 15px;
+		}
+
+		li {
+			margin: 10px 0;
+		}
+
+		.samples {
+			float: left;
+			width: 50%;
+			text-align: center;
+		}
+
+		.cond {
+			float: left;
+			margin: 0 40px;
+		}
+
+		.cond-container {
+			width: 700px;
+			margin: 0 auto;
+			text-align: center;
+		}
+
+		#vidalign {
+			display: block;
+			margin: 0px;
+			padding: 0px;
+			position: relative;
+			top: 90px;
+			height: auto;
+			max-width: auto;
+			overflow-y: hidden;
+			overflow-x: auto;
+			word-wrap: normal;
+			white-space: nowrap;
+		}
+
+		/* Add a black background color to the top navigation */
+		.topnav {
+			background-color: rgba(0, 0, 0, 0.2);
+			z-index: 1;
+			overflow: hidden;
+			position: fixed;
+			top: 0;
+			/* Position the navbar at the top of the page */
+			width: 100%;
+			/* Full width */
+		}
+
+		/* Style the links inside the navigation bar */
+		.topnav a {
+			float: left;
+			color: #333;
+			text-align: center;
+			padding: 14px 16px;
+			text-decoration: none;
+			font-size: 17px;
+		}
+
+		/* Change the color of links on hover */
+		.topnav a:hover {
+			background-color: #ddd;
+			color: black;
+		}
+
+		/* Add a color to the active/current link */
+		.topnav a.active {
+			background-color: #04AA6D;
+			color: white;
+		}
+
+		.icon {
+			background: src('./icon.png');
+			height: 20px;
+			width: 20px;
+			display: block;
+			/* Other styles here */
+		}
+	</style>
+
+	<style>
+		model-viewer {
+			width: 300px;
+			height: 300px;
+		}
+	</style>
+</head>
+
+<div class="topnav">
+	<a class="active" href="#top">Top</a>
+	<a href="#motiv">Motivation</a>
+	<a href="#method">Method Overview</a>
+	<a href="#comp">Comparisons</a>
+	<a href="#vids">Video Results</a>
+	<a href="#nvs">Novel View Rendering</a>
+	<a href="#aba">Ablations</a>
+	<a href="#bib">Bibtex</a>
+</div>
+
+<div id="top" class="content content-title" style="text-align: center;">
+	<h1>
+		PPR: Physically Plausible Reconstruction from Monocular Videos
+	</h1>
+	<p id="authors"></p>
+	<table align="center" style="width:100%; text-align:center; table-layout: fixed">
+		<tr>
+			<th><a href="https://gengshan-y.github.io/">Gengshan Yang</a></th>
+			<th><a href="https://shuoyangrobotics.github.io/">Shuo Yang</a></th>
+			<th><a href="https://www.ri.cmu.edu/ri-people/ziyang-zhang/">Ziyang Zhang</a></th>
+			<th><a href="http://roboticexplorationlab.org/">Zachary Manchester</a></th>
+			<th><a href="http://www.cs.cmu.edu/~deva/">Deva Ramanan</a></th>
+		</tr>
+	</table>
+	<table align="center" style="width:100%; text-align:center; table-layout: fixed">
+		<th>Carnegie Mellon University</th>
+	</table>
+	<center>
+		<img src="./materials/prints.png" style="height: 144px;" />
+	</center>
+</div>
+
+<div id="abs" class="content">
+	<h2>Abstract</h2>
+	<p>
+		Given monocular videos, we build 3D models of articulated objects and environments whose 3D configurations
+		satisfy dynamics and contact constraints. At its core, our method leverages differentiable physics simulation to
+		aid visual reconstructions. We couple differentiable physics simulation with differentiable rendering via
+		coordinate descent, which enables end-to-end optimization of, not only 3D reconstructions, but also physical
+		system parameters from videos. We demonstrate the effectiveness of physics-informed reconstruction on monocular
+		videos of quadruped animals and humans. It reduces reconstruction artifacts (e.g., scale ambiguity, unbalanced
+		poses, and foot swapping) that are challenging to address by visual cues alone, and produces better foot contact
+		estimation.
+	</p>
+	<div id="teaser" style="margin: 12px; text-align: left;border-top: 1px solid lightgray;padding-top: 12px;">
+		<a href="./PPR.pdf"><strong>[Paper]</strong></a>
+		<strong>[Code]</strong>
+		<!--
+			<a href="./banmo-cvpr.pdf">
+			  <strong>[Paper]</strong>
+			</a>
+			<a href="./banmo-poster.pdf">
+			  <strong>[Poster]</strong>
+			</a>
+			-->
+	</div>
+</div>
+
+<div id="motiv" class="content">
+	<div style="float: right; width:70px; margin-top: 0px; margin-bottom: 25px">
+	</div>
+	<h2>Motivation</h2>
+	<p>
+		In monocular vision, there is fundamental scale/depth ambiguity between
+		scene elements.
+		We motivate with an example illustrating the scale ambiguity between
+		a cat and the background.
+		Given the video on the left, we use existing methods to reconstruct the
+		the cat and the background independently, and then compose them with a
+		<i>relative scale factors</i> ranging from 0.4 to 3.
+		<br>
+		*We use variants of NeRF for background reconstruction, and BANMo for foreground
+		reconstruction.
+	</p>
+	<table align=center width=100%>
+		<tr>
+			<h3></h3>
+			<td width="19%">
+				<video playsinline controls autoplay muted width="100%">
+					<source src="./vids/cat-pikachiu-{0}-vid.mp4" type="video/mp4">
+				</video>
+			</td>
+			<td width="80%">
+				<video playsinline controls autoplay muted width="100%">
+					<source src="./materials/meshes/ref-cat-pikachiu-00-banmo-stack.mp4" type="video/mp4">
+				</video>
+			</td>
+		</tr>
+	</table>
+	<table align=center width=100%>
+		<tr>
+			<td style="padding: 10px; text-align: center; width: 19%;">
+				<strong> Input Video </strong>
+			</td>
+			<td style="padding: 10px; text-align: center; width: 20%;">
+				<strong> 0.4x cat scale </strong>
+			</td>
+			<td style="padding: 10px; text-align: center; width: 20%;">
+				<strong> 1x cat scale </strong>
+			</td>
+			<td style="padding: 10px; text-align: center; width: 20%;">
+				<strong> 2x cat scale </strong>
+			</td>
+			<td style="padding: 10px; text-align: center; width: 20%;">
+				<strong> 3x cat scale </strong>
+			</td>
+		</tr>
+	</table>
+	<p>
+		Although all the 2D projections align perfectly with the input frame,
+		their 3D trajecories appears quite different.
+		Applying a relative scale of 2x produces the most reasonable 3D trajectory.
+		A bigger scale factor (e.g., 3x) makes the cat appear to be sinking;
+		a smaller scale factor (e.g., 0.4x) makes the cat appear to be floating.
+
+
+		<br>
+		Below, we visualize the 3D trajectories of the cat with the background.
+		<br>
+		* We fix the background scale and vary the object scale. The camera trajectory is visualized as colored axes.
+	</p>
+
+	<table align=center width=100%>
+		<tr>
+			<h3></h3>
+			<td width="100%">
+				<video playsinline controls loop autoplay muted width="100%">
+					<source src="./materials/topdown/cat-pikachiu00-stack.mp4" type="video/mp4">
+				</video>
+			</td>
+		</tr>
+	</table>
+	<table align=center width=100%>
+		<tr>
+			<td style="padding: 10px; text-align: center; width: 25%;">
+				<strong> 0.4x cat scale </strong>
+			</td>
+			<td style="padding: 10px; text-align: center; width: 25%;">
+				<strong> 1x cat scale </strong>
+			</td>
+			<td style="padding: 10px; text-align: center; width: 25%;">
+				<strong> 2x cat scale </strong>
+			</td>
+			<td style="padding: 10px; text-align: center; width: 25%;">
+				<strong> 3x cat scale </strong>
+			</td>
+		</tr>
+	</table>
+	Besides scale, one may notice there are more ambiguities about the scene,
+	For instance, the body poses and the motion in the world frame.
+	As shown in "Reconstruction (2x)", although with a roughly correct scale,
+	the cat's feet are touching the ground at some frames (green), it is still floating with a <i>slanted</i> pose at
+	many other frames (red).
+
+	Those errors are confounded with the scale ambiguity, making it hard to correct
+	even with body and contact priors.
+	<br><i>
+		As a fundamental prior governing the dynamics and contact, can physics help us do better?
+	</i>
+</div>
+
+<div id="method" class="content">
+	<div style="float: right; width:70px; margin-top: 0px; margin-bottom: 25px">
+	</div>
+	<h2>Method Preview</h2>
+
+	<p>
+		We aim to find a physically-plausible 3D interpretation of a video
+		by coupling
+		<i>visual reconstruction</i> with <i>physics simulation</i>.
+		On one hand, visual reconstruction provides the starting point and a target trajectory
+		for physics simulation; on the other hand, physics simulation provides a prior for visual reconstruction.
+
+
+		By alternating between differentiable rendering optimization
+		and differentiable physics simulation, we can
+		reach a solution where the reconstruction is physically-plausible.
+
+		<center>
+			<image src="./materials/images/teaser.jpeg" width="80%">
+		</center>
+		<!-- Some existing methods use heuristics about body and contact.
+		  Though being powerful, there are reasons one may want to persue alternative approaches:
+		  One is that body and contact priors are not enough. 
+		  
+		  <br>
+		  Another is that body and contact priors are not always available. 
+		  For example, in the case of a person, the feet may not be visible in the input video.
+		  </p> -->
+		<br>
+		<br>
+	<p> Consider the input videos on the left, we show simulated motion over optimization cycles:</p>
+	<table align=center width=100%>
+		<tr>
+			<figure
+				style="float:left; font-family: Times; font-weight: normal; margin: 0 0 0 2; padding: 0px; border: 0px; text-align: left; width: 23%">
+				<center>
+					<video playsinline controls autoplay muted width="100%">
+						<source src="./vids/cat-pikachiu-{0}-vid.mp4" type="video/mp4">
+					</video>
+					<video playsinline controls autoplay muted width="100%">
+						<source src="./vids/ama-d-{6}-vid.mp4" type="video/mp4">
+					</video>
+				</center>
+				<figcaption>
+					These are the input video we want to track.
+				</figcaption>
+			</figure>
+
+			<figure
+				style="float:left; font-family: Times; font-weight: normal; margin: 0 0 0 2%; padding: 0px; border: 0px; text-align: left; width: 23%">
+				<center>
+					<video playsinline controls autoplay muted width="100%">
+						<source src="./vids/cat-pikachiu00-00000.mp4" type="video/mp4">
+					</video>
+
+					<video playsinline controls autoplay muted width="100%">
+						<source src="./vids/ama-d-00000.mp4" type="video/mp4">
+					</video>
+				</center>
+				<figcaption>
+					At the first cycle, the physical systems lose balance, because the trajectories provided by visual
+					reconstruction are infeasible.
+				</figcaption>
+			</figure>
+
+			<figure
+				style="float:left; font-family: Times; font-weight: normal; margin: 0 0 0 2%; padding: 0px; border: 0px; text-align: left; width: 23%">
+				<center>
+					<video playsinline controls autoplay muted width="100%">
+						<source src="./vids/cat-pikachiu00-00200.mp4" type="video/mp4">
+					</video>
+
+					<video playsinline controls autoplay muted width="100%">
+						<source src="./vids/ama-d-00500.mp4" type="video/mp4">
+					</video>
+
+				</center>
+				<figcaption>
+					After 25 cycles, the visual reconstruction (e.g., the scale) is improved,
+					allowing the the physical system to follow it.
+				</figcaption>
+			</figure>
+
+			<figure
+				style="float:left; font-family: Times; font-weight: normal; margin: 0 0 0 2%; padding: 0px; border: 0px; text-align: left; width: 23%">
+				<center>
+					<video playsinline controls autoplay muted width="100%">
+						<source src="./vids/cat-pikachiu00-002000.mp4" type="video/mp4">
+					</video>
+					<video playsinline controls autoplay muted width="100%">
+						<source src="./vids/ama-d-02000.mp4" type="video/mp4">
+					</video>
+				</center>
+				<figcaption>
+					As the reconstruction of body pose and root body motion becomes better,
+					the physical system successfully follows the reference video.
+				</figcaption>
+			</figure>
+		</tr>
+	</table>
+</div>
+
+<div id="comp" class="content">
+	<div style="float: right; width:70px; margin-top: 0px; margin-bottom: 25px">
+	</div>
+	<h2>Comparisons</h2>
+	<h3>Scale and Foot Contact (Fig. 2)</h3>
+	<table align=center width=100%>
+		<tr>
+			<td width="24%">
+				<video playsinline controls autoplay muted width="100%">
+					<source src="./vids/cat-pikachiu-{0}-vid.mp4" type="video/mp4">
+				</video>
+			</td>
+			<td width="75%">
+				<video playsinline controls autoplay muted width="100%">
+					<source src="./materials/meshes/cat-pikachiu00-stack.mp4" type="video/mp4">
+				</video>
+			</td>
+		</tr>
+	</table>
+
+	<table align=center width=100%>
+		<tr>
+			<td style="padding: 10px; text-align: center; width: 25%;">
+				<strong> Reference Video </strong>
+			</td>
+			<td style="padding: 10px; text-align: center; width: 25%;">
+				<strong> BANMo </strong>
+			</td>
+			<td style="padding: 10px; text-align: center; width: 25%;">
+				<strong> BANMo+contact prior </strong>
+			</td>
+			<td style="padding: 10px; text-align: center; width: 25%;">
+				<strong> PPR </strong>
+			</td>
+		</tr>
+	</table>
+
+	<p>
+		To augment BANMo results, we apply a simple contact prior (following NeuMan) to find an optimal
+		relative scale between the cat and the background: <i>the feet</i> should not penerate the ground,
+		and should touch the ground in <i>at least one frame</i>.
+		Although contact prior finds a rough scale that makes the feet
+		touch the ground for some frames (green), the cat's body still appears
+		floating with a <i>slanted</i> pose at many other frames (red).
+
+		Because PPR jointly solves the scale and pose under physics constraints,
+		it finds a configuration where the contact feet touch the ground.
+	</p>
+	<br>
+	<hr>
+	<br>
+	<h3>Body Pose Estimation (Fig. 6)</h3>
+	<table align=center width=100%>
+		<tr>
+			<td width=19%">
+				<video playsinline controls autoplay muted width="100%">
+					<source src="./vids/ama-t-{4}-vid.mp4" type="video/mp4">
+				</video>
+			</td>
+			<td width="80%">
+				<video playsinline controls autoplay muted width="100%">
+					<source src="./materials/meshes/T_samba1-stack.mp4" type="video/mp4">
+				</video>
+			</td>
+		</tr>
+	</table>
+
+	<table align=center width=100%>
+		<tr>
+			<td width=19%">
+				<video playsinline controls autoplay muted width="100%">
+					<source src="./vids/ama-d-{0}-vid-trm.mp4" type="video/mp4">
+				</video>
+			</td>
+			<td width="80%">
+				<video playsinline controls autoplay muted width="100%">
+					<source src="./materials/meshes/D_bouncing1-stack.mp4" type="video/mp4">
+				</video>
+			</td>
+		</tr>
+	</table>
+
+	<table align=center width=100%>
+		<tr>
+			<td style="padding: 10px; text-align: center; width: 20%;">
+				<strong> Reference Video </strong>
+			</td>
+			<td style="padding: 10px; text-align: center; width: 20%;">
+				<strong> HuMoR </strong>
+			</td>
+			<td style="padding: 10px; text-align: center; width: 20%;">
+				<strong> BANMo </strong>
+			</td>
+			<td style="padding: 10px; text-align: center; width: 20%;">
+				<strong> PPR </strong>
+			</td>
+			<td style="padding: 10px; text-align: center; width: 20%;">
+				<strong> Ground-truth </strong>
+			</td>
+		</tr>
+	</table>
+
+	<p>
+		We compare PPR with state-of-the-art methods for human motion reconstruction (Fig. 6).
+		HuMor accurately reconstructs the body pose of the samba sequence, with feet touching the ground.
+		However, its fails to reconstrcut the foot contact for the bouncing sequence.
+
+		For both sequences, BANMo reconstructs slanted body poses and inaccurate foot contact.
+
+		With the help of differentiable physics simulation, PPR reconstructs upright body poses and accurate foot
+		contact.
+
+	</p>
+	<br>
+	<hr>
+	<br>
+	<h3>3D Tracking (Fig. 5)</h3>
+	<table align=center width=100%>
+		<tr>
+			<td width="24%">
+				<video playsinline controls autoplay muted width="100%">
+					<source src="./vids/cat-pikachiu-{0}-vid.mp4" type="video/mp4">
+				</video>
+			</td>
+			<td width="25%">
+				<video playsinline controls autoplay muted width="100%">
+					<source src="./materials/tracking/track-cat-pikachiu00-banmo.mp4" type="video/mp4">
+				</video>
+			</td>
+			<td width="25%">
+				<video playsinline controls autoplay muted width="100%">
+					<source src="./materials/tracking/track-cat-pikachiu00-ppr.mp4" type="video/mp4">
+				</video>
+			</td>
+			<td width="25%">
+				<video playsinline controls autoplay muted width="100%">
+					<source src="./materials/tracking/vid2-simu-cat-pikachiu00-0.mp4" type="video/mp4">
+				</video>
+			</td>
+			</td>
+		</tr>
+	</table>
+
+	<table align=center width=100%>
+		<tr>
+			<td style="padding: 10px; text-align: center; width: 20%;">
+				<strong> Reference Video </strong>
+			</td>
+			<td style="padding: 10px; text-align: center; width: 20%;">
+				<strong> BANMo </strong>
+			</td>
+			<td style="padding: 10px; text-align: center; width: 20%;">
+				<strong> PPR </strong>
+			</td>
+			<td style="padding: 10px; text-align: center; width: 20%;">
+				<strong> PPR physics simulation </strong>
+			</td>
+		</tr>
+	</table>
+
+	<p>
+		We compare BANMo and PPR in terms of 3D tracking. BANMo fails to track
+		the left rear foot (colored tracks) due to heavy occlusion during the walking motion. Note
+		the track on the left foot is swapped with the right foot occasionally.
+		Furthermore, it creates an artificial leg to explain the missing tracks on the front leg.
+		<br>
+		In contrast, PPR tracks the feet well, and does not create an artificial leg.
+		Because PPR produces physically plausible reconstruction, the captured motion can be
+		simulated with a physics engine (right).
+	</p>
+
+	<br>
+	<hr>
+	<br>
+	<h3>Comparison with Animal Body Model (Supp. Fig. 2)</h3>
+	<table align=center width=100%>
+		<tr>
+			<td width="25%">
+				<video playsinline controls autoplay muted width="100%">
+					<source src="./materials/comprisons/vid-shiba-1001.mp4" type="video/mp4">
+				</video>
+			</td>
+			<td width="25%">
+				<video playsinline controls autoplay muted width="100%">
+					<source src="./materials/comprisons/barc-shiba-1001.mp4" type="video/mp4">
+				</video>
+			</td>
+			<td width="25%">
+				<video playsinline controls autoplay muted width="100%">
+					<source src="./materials/comprisons/ppr-shiba-1001.mp4" type="video/mp4">
+				</video>
+			</td>
+			<p>
+				BARC fails to reconstruct the sharp ears of the dog, and puts the legs into the wrong positions, while
+				PPR faithfully reconstructs them.
+		</tr>
+	</table>
+
+	<table align=center width=100%>
+		<tr>
+			<td style="padding: 10px; text-align: center; width: 20%;">
+				<strong> Reference Video </strong>
+			</td>
+			<td style="padding: 10px; text-align: center; width: 20%;">
+				<strong> BARC </strong>
+			</td>
+			<td style="padding: 10px; text-align: center; width: 20%;">
+				<strong> PPR </strong>
+			</td>
+		</tr>
+	</table>
+</div>
+
+
+<div id="vids" class="content">
+	<div style="float: right; width:70px; margin-top: 0px; margin-bottom: 25px">
+	</div>
+	<h2>Video Results (Fig. 4)</h2>
+	<h3>Casual-Cat <a href='materials/casual-cat.html'> &#8594[More]</a></h3>
+	<video playsinline loop controls autoplay muted width="70%">
+		<source src="./materials/vids/cat-pikachiu-phys-{0}-all.mp4" type="video/mp4">
+	</video>
+	<video playsinline loop controls autoplay muted width="29%">
+		<source src="./materials/meshes/cat-pikachiu00-ppr.mp4" type="video/mp4">
+	</video>
+	<br>
+	<hr>
+	<h3>Casual-Dog <a href='materials/casual-dog.html'> &#8594[More]</a></h3>
+	<video playsinline loop controls autoplay muted width="70%">
+		<source src="./materials/vids/shiba-haru-1-{4}-all.mp4" type="video/mp4">
+	</video>
+	<video playsinline loop controls autoplay muted width="29%">
+		<source src="./materials/meshes/shiba-haru-1005-ppr.mp4" type="video/mp4">
+	</video>
+	<br>
+	<hr>
+	<h3>Casual-Human <a href='materials/casual-human.html'> &#8594[More]</a></h3>
+	<video playsinline loop controls autoplay muted width="60%">
+		<source src="./materials/vids/adult7-{5}-all.mp4" type="video/mp4">
+	</video>
+	<video playsinline loop controls autoplay muted width="39%">
+		<source src="./materials/meshes/adult-407-ppr.mp4" type="video/mp4">
+	</video>
+	<br>
+	<hr>
+	<h3>AMA-samba</h3>
+	<video playsinline loop controls autoplay muted width="70%">
+		<source src="./materials/vids/ama-t-{4}-all.mp4" type="video/mp4">
+	</video>
+	<video playsinline loop controls autoplay muted width="29%">
+		<source src="./materials/meshes/T_samba1-ppr3.mp4" type="video/mp4">
+	</video>
+	<h3>AMA-bouncing</h3>
+	<video playsinline loop controls autoplay muted width="70%">
+		<source src="./materials/vids/ama-d-{0}-all.mp4" type="video/mp4">
+	</video>
+	<video playsinline loop controls autoplay muted width="29%">
+		<source src="./materials/meshes/D_bouncing1-ppr.mp4" type="video/mp4">
+	</video>
+</div>
+
+<div id="nvs" class="content">
+	<div style="float: right; width:70px; margin-top: 0px; margin-bottom: 25px">
+	</div>
+	<h2>Novel View Synthesis</h2>
+	<h3>Reference View</h3>
+	<video playsinline loop controls autoplay muted width="100%">
+		<source src="./materials/nvs/cat-pikachiu-phys-{7}-vp0.mp4" type="video/mp4">
+	</video>
+	<h3>Fixed Camera View</h3>
+	<video playsinline loop controls autoplay muted width="100%">
+		<source src="./materials/nvs/cat-pikachiu-phys-{7}-vp1.mp4" type="video/mp4">
+	</video>
+	<h3>Top View</h3>
+	<video playsinline loop controls autoplay muted width="100%">
+		<source src="./materials/nvs/cat-pikachiu-phys-{7}-vp2.mp4" type="video/mp4">
+	</video>
+	<table align=center width=100%>
+		<tr>
+			<td style="padding: 10px; text-align: center; width: 20%;">
+				<strong> Input Video </strong>
+			</td>
+			<td style="padding: 10px; text-align: center; width: 20%;">
+				<strong> Surface Normal </strong>
+			</td>
+			<td style="padding: 10px; text-align: center; width: 20%;">
+				<strong> Skeleton/Mesh </strong>
+			</td>
+		</tr>
+	</table>
+</div>
+
+
+<div id="aba" class="content">
+	<div style="float: right; width:70px; margin-top: 0px; margin-bottom: 25px">
+	</div>
+	<h2>Ablations (Tab. 3)</h2>
+	<table align=center width=50%>
+		<tr>
+			<td width="55%">
+				<figcaption><strong>Reference Video</strong></figcaption>
+				<video playsinline controls autoplay muted width="100%">
+					<source src="./vids/ama-t-{4}-vid.mp4" type="video/mp4">
+				</video>
+			</td>
+			<td width="44%">
+				<figcaption></figcaption><strong>Ground-truth</strong></figcaption>
+				<video playsinline controls autoplay muted width="100%">
+					<source src="./materials/meshes/T_samba1-gt-trim.mp4" type="video/mp4">
+				</video>
+			</td>
+		</tr>
+	</table>
+	<table align=center width=100%>
+		<tr>
+			<td style="padding: 10px; text-align: center; width: 20%;">
+				<strong> Full method </strong>
+			</td>
+			<td style="padding: 10px; text-align: center; width: 20%;">
+				<strong> Physics &#8594 ground-fitting </strong>
+			</td>
+			<td style="padding: 10px; text-align: center; width: 20%;">
+				<strong> Multi cycle &#8594 one-cycle </strong>
+			</td>
+			<td style="padding: 10px; text-align: center; width: 20%;">
+				<strong> PD control &#8594 open-loop control </strong>
+			</td>
+			<td style="padding: 10px; text-align: center; width: 20%;">
+				<strong> Freeze PD gain and mass </strong>
+			</td>
+		</tr>
+	</table>
+
+	<table align=center width=100%>
+		<tr>
+			<td width="100%">
+				<video playsinline controls autoplay muted width="100%">
+					<source src="./materials/meshes/T_samba1-aba-stack.mp4" type="video/mp4">
+				</video>
+				<video playsinline controls autoplay muted width="100%">
+					<source src="./materials/eval/ama-t-{4}-eval-stack.mp4" type="video/mp4">
+				</video>
+			</td>
+		</tr>
+	</table>
+	In the first row, we render reconstructed mesh sequences. PPR works better than
+	ground-fitting on foot contact estimation.
+	<br>
+	In the bottom two rows, we visualize the surface reconstruction errors.
+
+	Top: Ground-truth. Bottom: Predicted meshes.
+	The color indicates the Chamfer distance between the ground-truth and the predicted mesh (yellow: large error).
+</div>
+
+
+<div id="bib" class="content">
+	<h2>Bibtex</h2>
+	<p class="description">@inproceedings{yang2023ppr,
+		title={Physically Plausible Reconstruction from Monocular Videos},
+		author={Yang, Gengshan
+		and Yang, Shuo
+		and Zhang, Ziyang
+		and Manchester, Zachary
+		and Ramanan, Deva},
+		journal = {Preprint},
+		year={2023}
+		} </p>
+</div>
+
+
+
+<div class="content">
+	<h2>Related Papers</h2>
+	<p>
+		Deformable shape reconstruction from video(s):<br>
+		<a href="https://banmo-www.github.io/"> BANMo: Building Animatable 3D Neural Models from Many Casual Videos.
+			CVPR 2022.</a> <br>
+		<a href="https://viser-shape.github.io/"> ViSER: Video-Specific Surface Embeddings for Articulated 3D Shape
+			Reconstruction. NeurIPS 2021.</a> <br>
+		<a href="https://lasr-google.github.io/"> LASR: Learning Articulated Shape Reconstruction from a Monocular
+			Video. CVPR 2021.</a> <br>
+		<a href="https://dove3d.github.io/"> DOVE: Learning Deformable 3D Objects by Watching Videos. arXiv
+			preprint.</a> <br>
+		Physics-based video human reconstruction:<br>
+		<a href="https://gartner.io/diffphy/"> Differentiable Dynamics for Articulated 3d Human Motion Reconstruction.
+			CVPR 2022.</a> <br>
+		<a href="https://gartner.io/trajectory/"> Trajectory Optimization for Physics-Based Reconstruction of 3d Human
+			Pose from Monocular Video. CVPR 2022.</a> <br>
+		<a href="https://geometry.stanford.edu/projects/human-dynamics-eccv-2020/"> Contact and Human Dynamics from
+			Monocular Video. ECCV 2020.</a> <br>
+		<a href="https://vcai.mpi-inf.mpg.de/projects/PhysCap/"> PhysCap: Physically Plausible Monocular 3D Motion
+			Capture in Real Time. SIGGRAPH Asia 2020.</a> <br>
+		Physics-based video scene reconstruction:<br>
+		<a href="https://sites.google.com/view/neuphysics/">
+			NeuPhysics: Editable Neural Geometry and Physics from Monocular Videos. NeurIPS 2022.
+		</a> <br>
+		<a href="http://risp.csail.mit.edu/">
+			RISP: Rendering-Invariant State Predictor with Differentiable Simulation and Rendering for Cross-Domain
+			Parameter Estimation. ICLR 2021.
+		</a> <br>
+	</p>
+</div>
+
+<div class="content">
+	<h2>Acknowledgments</h2>
+	<p>
+		Gengshan Yang is supported by the Qualcomm Innovation Fellowship and CMU Argo AI Center for Autonomous Vehicle
+		Research.
+		We thank Tao Chen and Xianyi Cheng for suggestions on simulation tools. We thank Swaminathan Gurumurthy for
+		feedback on control and Sha Yi for help with 3D printing.
+	</p>
+</div>
+
+
+<table width="100%" align="center" border="0" cellspacing="0" cellpadding="20">
+	<tr>
+		<td>
+			<p align="right">
+				<font size="2">
+					<a href="https://www.cs.cmu.edu/~peiyunh/">Webpage design borrowed from Peiyun Hu</a>
+				</font>
+			</p>
+		</td>
+	</tr>
+</table>
+
+</body>
+
+</html>
