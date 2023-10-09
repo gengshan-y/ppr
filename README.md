@@ -46,7 +46,17 @@ Second stage is a physics-informed optimization that couples the object and the 
 # Args: gpu-id sequence name, hyper-parameters in both lab4d/config.py and and projects/ppr/config.py
 bash scripts/train.sh projects/ppr/train.py 0 --seqname cat-pikachu-0 --logname ppr --field_type comp --fg_motion urdf-quad --feature_type cse --num_rounds 20 --learning_rate 1e-4 --pixels_per_image 12 --iters_per_round 100 --ratio_phys_cycle 0.5 --phys_vis_interval 20 --secs_per_wdw 2.4 --noreset_steps  --noabsorb_base --load_path logdir/cat-pikachu-0-fg-urdf/ckpt_latest.pth --load_path_bg logdir/cat-pikachu-0-bg/ckpt_latest.pth
 ```
-Note: Multiple gpus are not supported in physics-informed optimization for now.
+You may find the physics simulation results at `logdir/cat-pikachu-0-ppr/all-phys-00-05d.mp4`. 
+
+Visualization at 0 iteration. Left to right: target, simulated, control reference, "distilled" simulation (to regularize diff-rendering).
+
+https://github.com/gengshan-y/ppr/assets/13134872/22279f93-3e28-4e30-bbc8-f771f38257f0
+
+Visualization at 1000 iteration:
+
+https://github.com/gengshan-y/ppr/assets/13134872/3a769bb5-00d3-4f06-8d1c-6b3ffbdc37e2
+
+Note: Multi-gpu physics-informed optimization is not supported as of now. 
 
 ## Visualization
 
@@ -54,16 +64,20 @@ To visulize the intermediate simulated trajectories over the course of optimizat
 ```
 python projects/ppr/render_intermediate.py --testdir logdir/cat-pikachu-0-ppr/ --data_class sim
 ```
+https://github.com/gengshan-y/ppr/assets/13134872/b1b18209-bd41-4f5d-a2d7-093b1b1dc8e2
 
 To export meshes and visualize results, run
 ```
 python projects/ppr/export.py --flagfile=logdir/cat-pikachu-0-ppr/opts.log --load_suffix 0060 --inst_id 0 --vis_thresh -10 --extend_aabb
 ```
+https://github.com/gengshan-y/ppr/assets/13134872/1987a40f-1450-4cb9-a529-527a1b347fb3
 
 There are a few other modes supported by our mesh renderer, such as bird's eye view, and ghosting.
 ```
 python lab4d/render_mesh.py --testdir logdir/cat-pikachu-0-ppr/export_0000/ --view bev --ghosting
 ```
+https://github.com/gengshan-y/ppr/assets/13134872/354ff079-627f-406b-bab6-32b5f53fa43c
+
 
 We use [viser](https://github.com/nerfstudio-project/viser) for interactive visualization.
 Install viser by `pip install viser`, then run
