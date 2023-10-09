@@ -60,7 +60,7 @@ Note: Multi-gpu physics-informed optimization is not supported as of now.
 
 ## Visualization
 
-To visulize the intermediate simulated trajectories over the course of optimization:
+To visualize the intermediate simulated trajectories over the course of optimization:
 ```
 python projects/ppr/render_intermediate.py --testdir logdir/cat-pikachu-0-ppr/ --data_class sim
 ```
@@ -79,11 +79,13 @@ python lab4d/render_mesh.py --testdir logdir/cat-pikachu-0-ppr/export_0000/ --vi
 https://github.com/gengshan-y/ppr/assets/13134872/354ff079-627f-406b-bab6-32b5f53fa43c
 
 
-We use [viser](https://github.com/nerfstudio-project/viser) for interactive visualization.
-Install viser by `pip install viser`, then run
+We use [viser](https://github.com/nerfstudio-project/viser) for interactive visualization of the 4D scene.
+Install viser by `pip install viser`. Once the result meshes have been exported to `logdir/$logname/export_$inst_id`, run
 ```
 python lab4d/mesh_viewer.py --testdir logdir/cat-pikachu-0-ppr/export_0000/
 ```
+https://github.com/gengshan-y/ppr/assets/13134872/fdf057dc-d97d-4b4c-ba17-a5fd5b9fdaff
+
 
 ## Evaluation (WIP)
 First download the [AMA data](https://people.csail.mit.edu/drdaniel/mesh_animation/) and place it at `database/ama/T_samba/{meshes/, calibration/}`. Then install a few extra dependencies:
