@@ -23,25 +23,28 @@ pip install geomloss==0.2.6
 ```
 
 ## Video to 4D and Physics
+
+### Get data
 We show how PPR works using the `cat-pikachu-0` sequence. Begin by downloading the pre-processed video data.
 ```
 bash scripts/download_unzip.sh "https://www.dropbox.com/scl/fi/j2bztcv49mqc4a6ngj8jp/cat-pikachu-0.zip?rlkey=g2sw8te19bsirr5srdl17kzt1&dl=0"
 ```
 Note: Processing follows the [pre-processing pipeline](https://lab4d-org.github.io/lab4d/tutorials/preprocessing.html) of lab4d, except frames are extracted with a constant rate of 10 fps (no flow-guided filtering).
 
+### Training
 Training has 2 stages. We first optimize background and object. The following can be executed in parallel. 
 To reconstruct the background scene:
 ```
 # Args: gpu-id, sequence name, hyper-parameters defined in lab4d/config.py
 bash scripts/train.sh lab4d/train.py 0 --seqname cat-pikachu-0 --logname bg --field_type bg --data_prefix full --num_rounds 60 --alter_flow --mask_wt 0.0 --normal_wt 1e-3 --reg_eikonal_wt 0.01
 ```
-To reconstrut the object:
+To reconstruct the object:
 ```
 # Args: gpu-id, sequence name, hyper-parameters defined in lab4d/config.py
 bash scripts/train.sh lab4d/train.py 1 --seqname cat-pikachu-0 --logname fg-urdf --fg_motion urdf-quad --num_rounds 20 --feature_type cse
 ```
 
-Second stage is a physics-informed optimization that couples the object and the scene:
+The second stage is a physics-informed optimization that couples the object and the scene:
 ```
 # Args: gpu-id sequence name, hyper-parameters in both lab4d/config.py and and projects/ppr/config.py
 bash scripts/train.sh projects/ppr/train.py 0 --seqname cat-pikachu-0 --logname ppr --field_type comp --fg_motion urdf-quad --feature_type cse --num_rounds 20 --learning_rate 1e-4 --pixels_per_image 12 --iters_per_round 100 --ratio_phys_cycle 0.5 --phys_vis_interval 20 --secs_per_wdw 2.4 --noreset_steps  --noabsorb_base --load_path logdir/cat-pikachu-0-fg-urdf/ckpt_latest.pth --load_path_bg logdir/cat-pikachu-0-bg/ckpt_latest.pth
@@ -58,7 +61,7 @@ https://github.com/gengshan-y/ppr/assets/13134872/3a769bb5-00d3-4f06-8d1c-6b3ffb
 
 Note: Multi-gpu physics-informed optimization is not supported as of now. 
 
-## Visualization
+### Visualization
 
 To visualize the intermediate simulated trajectories over the course of optimization:
 ```
@@ -72,12 +75,13 @@ python projects/ppr/export.py --flagfile=logdir/cat-pikachu-0-ppr/opts.log --loa
 ```
 https://github.com/gengshan-y/ppr/assets/13134872/1987a40f-1450-4cb9-a529-527a1b347fb3
 
-There are a few other modes supported by our mesh renderer, such as bird's eye view, and ghosting.
+There are a few other modes supported by the mesh renderer, such as bird's eye view, and ghosting.
 ```
 python lab4d/render_mesh.py --testdir logdir/cat-pikachu-0-ppr/export_0000/ --view bev --ghosting
 ```
 https://github.com/gengshan-y/ppr/assets/13134872/354ff079-627f-406b-bab6-32b5f53fa43c
 
+### Interactive Visualization
 
 We use [viser](https://github.com/nerfstudio-project/viser) for interactive visualization of the 4D scene.
 Install viser by `pip install viser`. Once the result meshes have been exported to `logdir/$logname/export_$inst_id`, run
@@ -85,6 +89,19 @@ Install viser by `pip install viser`. Once the result meshes have been exported 
 python lab4d/mesh_viewer.py --testdir logdir/cat-pikachu-0-ppr/export_0000/
 ```
 https://github.com/gengshan-y/ppr/assets/13134872/fdf057dc-d97d-4b4c-ba17-a5fd5b9fdaff
+
+### Simulation After Training
+
+To run physics simulation with the optimized parameters (control reference, body mass, PD gains):
+```
+python projects/ppr/simulate.py --flagfile=logdir/cat-pikachu-0-ppr/opts.log --load_suffix latest --load_suffix_phys latest --inst_id 0
+```
+
+To visualize the output in the interactive mode:
+```
+python lab4d/mesh_viewer.py --testdir logdir//cat-pikachu-0-ppr-exp2/simulate_0000/sim_traj/
+```
+https://github.com/gengshan-y/ppr/assets/13134872/3b9e7adb-7529-4b2e-a199-a9214d43de28
 
 
 ## Evaluation (WIP)
