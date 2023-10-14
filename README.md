@@ -1,9 +1,8 @@
 # PPR: Physically Plausible Reconstruction from Monocular Videos
 
-This repo contains instructions for running "PPR: Physically Plausible Reconstruction from Monocular Videos (ICCV 23)". 
-If you are interested in differentiable physics simulation (4D to physics), see the standalone repo [ppr-diffphysics](https://github.com/gengshan-y/ppr-diffphys).
-If you are interested in differentiable rendering (video to 4D), see [lab4d](https://github.com/lab4d-org/lab4d).
-Read on if you are interested in coupling DiffRen and DiffSim.
+This repo contains instructions for executing "PPR: Physically Plausible Reconstruction from Monocular Videos (ICCV 23)", which builds 4D models of the object and the environment by coupling differentiable rendering and differentiable physics simulation.
+For differentiable physics simulation (4D to physics), please refer to our dedicated repo at [ppr-diffphysics](https://github.com/gengshan-y/ppr-diffphys).
+For differentiable rendering (video to 4D), please see [lab4d](https://github.com/lab4d-org/lab4d).
 
 **[[Project page]](https://gengshan-y.github.io/ppr/)**
 
@@ -71,7 +70,7 @@ https://github.com/gengshan-y/ppr/assets/13134872/b1b18209-bd41-4f5d-a2d7-093b1b
 
 To export meshes and visualize results, run
 ```
-python projects/ppr/export.py --flagfile=logdir/cat-pikachu-0-ppr/opts.log --load_suffix 0060 --inst_id 0 --vis_thresh -10 --extend_aabb
+python projects/ppr/export.py --flagfile=logdir/cat-pikachu-0-ppr/opts.log --load_suffix latest --inst_id 0 --vis_thresh -10 --extend_aabb
 ```
 https://github.com/gengshan-y/ppr/assets/13134872/1987a40f-1450-4cb9-a529-527a1b347fb3
 
