@@ -35,7 +35,7 @@ Training has 2 stages. We first optimize background and object. The following ca
 To reconstruct the background scene:
 ```
 # Args: gpu-id, sequence name, hyper-parameters defined in lab4d/config.py
-bash scripts/train.sh lab4d/train.py 0 --seqname cat-pikachu-0 --logname bg --field_type bg --data_prefix full --num_rounds 60 --alter_flow --mask_wt 0.0 --normal_wt 1e-3 --reg_eikonal_wt 0.01
+bash scripts/train.sh lab4d/train.py 0 --seqname cat-pikachu-0 --logname bg --field_type bg --data_prefix full --num_rounds 60 --alter_flow --mask_wt 0.01 --normal_wt 1e-2 --reg_eikonal_wt 0.01
 ```
 To reconstruct the object:
 ```
@@ -46,7 +46,7 @@ bash scripts/train.sh lab4d/train.py 1 --seqname cat-pikachu-0 --logname fg-urdf
 The second stage is a physics-informed optimization that couples the object and the scene:
 ```
 # Args: gpu-id sequence name, hyper-parameters in both lab4d/config.py and and projects/ppr/config.py
-bash scripts/train.sh projects/ppr/train.py 0 --seqname cat-pikachu-0 --logname ppr --field_type comp --fg_motion urdf-quad --feature_type cse --num_rounds 20 --learning_rate 1e-4 --pixels_per_image 12 --iters_per_round 100 --ratio_phys_cycle 0.5 --phys_vis_interval 20 --secs_per_wdw 2.4 --noreset_steps  --noabsorb_base --load_path logdir/cat-pikachu-0-fg-urdf/ckpt_latest.pth --load_path_bg logdir/cat-pikachu-0-bg/ckpt_latest.pth
+bash scripts/train.sh projects/ppr/train.py 0 --seqname cat-pikachu-0 --logname ppr --field_type comp --fg_motion urdf-quad --feature_type cse --num_rounds 20 --learning_rate 1e-4 --pixels_per_image 12 --iters_per_round 100 --secs_per_wdw 2.4 --noreset_steps  --noabsorb_base --load_path logdir/cat-pikachu-0-fg-urdf/ckpt_latest.pth --load_path_bg logdir/cat-pikachu-0-bg/ckpt_latest.pth
 ```
 You may find the physics simulation results at `logdir/cat-pikachu-0-ppr/all-phys-00-05d.mp4`. 
 
