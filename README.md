@@ -103,8 +103,25 @@ python lab4d/mesh_viewer.py --testdir logdir//cat-pikachu-0-ppr-exp2/simulate_00
 https://github.com/gengshan-y/ppr/assets/13134872/3b9e7adb-7529-4b2e-a199-a9214d43de28
 
 
-## Evaluation (WIP)
-First download the [AMA data](https://people.csail.mit.edu/drdaniel/mesh_animation/) and place it at `database/ama/T_samba/{meshes/, calibration/}`. Then install a few extra dependencies:
+## Results on AMA and Evaluation
+### Training
+Run the following script to get results on [AMA](https://people.csail.mit.edu/drdaniel/mesh_animation/) samba and bouncing sequences.
+```
+bash projects/ppr/run_ama.sh
+```
+It downloads the pre-processed data and then runs training and visualization routines. We suggest reading the comments in the script to understand what happens in each step. Expected results:
+
+
+
+https://github.com/gengshan-y/ppr/assets/13134872/0849d538-7176-4465-b391-485f3b440b1b
+
+
+https://github.com/gengshan-y/ppr/assets/13134872/ddd342bb-2bc3-4aad-ba7a-ad02d43672c1
+
+
+### Evaluation
+First download the [AMA data](https://people.csail.mit.edu/drdaniel/mesh_animation/) and place it at `database/ama/T_samba/{meshes/, calibration/}`. 
+For running evaluation scripts, a few extra dependencies need to be installed:
 ```
 pip intall git+https://github.com/facebookresearch/pytorch3d
 ```
@@ -113,7 +130,7 @@ Once the result meshes have been exported to `logdir/$logname/export_$inst_id`, 
 ```
 python projects/ppr/eval/compute_metrics.py --testdir logdir//ama-bouncing-4v-ppr-exp/export_0000/ --gt_seq D_bouncing-1 --pred_prefix "" --fps 30
 ```
-This comptues chamfer distance and f-score on the mesh sequence by comparing against the ground-truth.
+This comptutes chamfer distance and f-score on the mesh sequence by comparing against the ground-truth.
 
 Results of DiffRen optimization-only:
 ```
