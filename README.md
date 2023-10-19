@@ -130,21 +130,21 @@ Once the result meshes have been exported to `logdir/$logname/export_$inst_id`, 
 ```
 python projects/ppr/eval/compute_metrics.py --testdir logdir//ama-bouncing-4v-ppr-exp/export_0000/ --gt_seq D_bouncing-1 --pred_prefix "" --fps 30
 ```
-This comptutes chamfer distance and f-score on the mesh sequence by comparing against the ground-truth.
+This computes chamfer distance and f-score on the mesh sequence by comparing it against the ground truth.
 
 Results of DiffRen optimization-only:
 ```
-  Avg chamfer dist: 8.28cm
-  Avg f-score at d=10cm: 92.5%
-  Avg f-score at d=5cm:  72.1%
-  Avg f-score at d=2cm:  33.9%  
+  Avg chamfer dist: 10.90cm
+  Avg f-score at d=10cm: 85.6%
+  Avg f-score at d=5cm:  61.4%
+  Avg f-score at d=2cm:  25.3%
 ```
 Results of DiffRen+DiffSim optimization:
 ```
-  Avg chamfer dist: 7.85cm
-  Avg f-score at d=10cm: 93.4%
-  Avg f-score at d=5cm:  74.3%
-  Avg f-score at d=2cm:  35.3%
+  Avg chamfer dist: 8.85cm
+  Avg f-score at d=10cm: 90.6%
+  Avg f-score at d=5cm:  70.0%
+  Avg f-score at d=2cm:  32.3%
 ```
 
 Note: The paper uses the old codebase so the the numbers might differ. We plan to revise the paper so it matches this codebase.
