@@ -123,7 +123,7 @@ https://github.com/gengshan-y/ppr/assets/13134872/ddd342bb-2bc3-4aad-ba7a-ad02d4
 First download the [AMA data](https://people.csail.mit.edu/drdaniel/mesh_animation/) and place it at `database/ama/T_samba/{meshes/, calibration/}`. 
 For running evaluation scripts, a few extra dependencies need to be installed:
 ```
-pip intall git+https://github.com/facebookresearch/pytorch3d
+pip install git+https://github.com/facebookresearch/pytorch3d
 ```
 
 Once the result meshes have been exported to `logdir/$logname/export_$inst_id`, execute
