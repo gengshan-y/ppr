@@ -6,6 +6,8 @@ For differentiable rendering (video to 4D), please see [lab4d](https://github.co
 
 **[[Project page]](https://gengshan-y.github.io/ppr/)**
 
+**Attention: Compared to lab4d main branch, ppr additionally extracts surface normal. Make sure you re-run the pre-processing script if your data was previously processed by lab4d main.**
+
 ## Installation
 Follow instructions to install [lab4d](https://lab4d-org.github.io/lab4d/get_started/). 
 Inside lab4d root directory, checkout the ppr branch and update the diffphys submodule.
@@ -29,7 +31,6 @@ We show how PPR works using the `cat-pikachu-0` sequence. Begin by downloading t
 bash scripts/download_unzip.sh "https://www.dropbox.com/scl/fi/j2bztcv49mqc4a6ngj8jp/cat-pikachu-0.zip?rlkey=g2sw8te19bsirr5srdl17kzt1&dl=0"
 ```
 Note: Processing follows the [pre-processing pipeline](https://lab4d-org.github.io/lab4d/tutorials/preprocessing.html) of lab4d, except frames are extracted with a constant rate of 10 fps (no flow-guided filtering).
-**Attention: compared to lab4d main branch, ppr additionally extracts surface normal. Make sure you re-run the pre-processing script if your data was previously processed by lab4d main.**
 
 ### Training
 Training has 2 stages. We first optimize background and object. The following can be executed in parallel. 
