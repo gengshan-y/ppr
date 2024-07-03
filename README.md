@@ -6,7 +6,7 @@ For differentiable rendering (video to 4D), please see [lab4d](https://github.co
 
 **[[Project page]](https://gengshan-y.github.io/ppr/)**
 
-**Attention: Compared to lab4d main branch, ppr additionally extracts surface normal. Make sure you re-run the pre-processing script if your data was previously processed by lab4d main.**
+**Attention: Compared to lab4d main branch, ppr additionally extracts surface normal. Make sure you rerun `bash scripts/install-deps.sh` and the pre-processing script if the data was previously processed by lab4d main.**
 
 ## Installation
 Follow instructions to install [lab4d](https://lab4d-org.github.io/lab4d/get_started/). 
